@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Map - ACF Sarkis & Suzan Kitsinian Youth Center Grand Opening</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        #map {
+            height: calc(100vh - 220px);
+            width: 100%;
+        }
+        .legend {
+            background: white;
+            padding: 15px 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+        .legend h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .legend-icon.venue {
+            background: #DC2626;
+            color: white;
+        }
+        .legend-icon.parking {
+            background: #2563EB;
+            color: white;
+        }
+        .legend-icon.street {
+            background: #22C55E;
+            width: 30px;
+            height: 8px;
+            border-radius: 4px;
+        }
+        .info-box {
+            display: flex;
+            gap: 20px;
+            padding: 10px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+        .info-item {
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .info-item.hours {
+            background: #f0fdf4;
+            border: 1px solid #22C55E;
+            color: #166534;
+        }
+        .info-item.warning {
+            background: #fef2f2;
+            border: 1px solid #DC2626;
+            color: #991b1b;
+        }
+        .info-item strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+        /* Custom marker styles */
+        .custom-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .venue-marker {
+            background: #DC2626;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border: 3px solid white;
+        }
+        .parking-marker {
+            background: #2563EB;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border: 3px solid white;
+        }
+        .leaflet-popup-content {
+            font-family: Arial, sans-serif;
+        }
+        .popup-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .popup-address {
+            color: #64748b;
+            font-size: 12px;
+        }
+        .popup-venue {
+            color: #DC2626;
+        }
+        .popup-parking {
+            color: #2563EB;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PARKING MAP</h1>
+        <p>ACF Sarkis & Suzan Kitsinian Youth Center Grand Opening | 5001 Balboa Blvd, Encino, CA 91316</p>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="legend">
+        <h3>LEGEND</h3>
+        <div class="legend-items">
+            <div class="legend-item">
+                <div class="legend-icon venue">★</div>
+                <span>ACF Sarkis & Suzan Kitsinian Youth Center (Event Venue)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon parking">P</div>
+                <span>Designated Parking Lots</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon street"></div>
+                <span>Street Parking Available (both sides)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <div class="info-item hours">
+            <strong>Street Parking Hours: 11:00 AM - 8:00 PM</strong>
+            Restrictions relaxed on marked streets (both sides)
+        </div>
+        <div class="info-item warning">
+            <strong>Still Enforced:</strong>
+            Red zones, handicapped zones, tow-away zones, alleys, sidewalks, no-parking signs
+        </div>
+    </div>
+
+    <script>
+        // Initialize the map centered on the Youth Center area
+        // Based on verified coordinates: Encino Community Center at 34.1603413, -118.5013743
+        const map = L.map('map', {
+            attributionControl: false,
+            zoomSnap: 0.25,
+            zoomDelta: 0.5,
+            wheelPxPerZoomLevel: 120
+        }).setView([34.1608, -118.5014], 17);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Custom icon for venue (star)
+        const venueIcon = L.divIcon({
+            className: 'custom-marker venue-marker',
+            html: '★',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
+        });
+
+        // Custom icon for parking
+        const parkingIcon = L.divIcon({
+            className: 'custom-marker parking-marker',
+            html: 'P',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
+            popupAnchor: [0, -18]
+        });
+
+        // VERIFIED coordinates from OpenStreetMap:
+        // Encino Community Center (4935 Balboa): 34.1601849, -118.5014111
+        // First Presbyterian Church (4963 Balboa): 34.1612015, -118.5015664
+        // Youth Center (5001 Balboa): Calculated based on address spacing = 34.1626, -118.5015
+
+        // Add venue marker - ACF Sarkis & Suzan Kitsinian Youth Center (5001 Balboa Blvd)
+        // Building at northwest corner of Balboa & Addison (OSM building 431374374)
+        L.marker([34.1619180, -118.5014884], {icon: venueIcon})
+            .addTo(map)
+            .bindPopup('<div class="popup-title popup-venue">ACF Sarkis & Suzan Kitsinian Youth Center</div><div class="popup-address">5001 Balboa Blvd, Encino, CA 91316<br><strong>EVENT VENUE</strong></div>')
+            .openPopup();
+
+        // Add parking markers
+        // First Presbyterian Church (4963 Balboa Blvd) - VERIFIED OSM coordinates
+        L.marker([34.1612015, -118.5015664], {icon: parkingIcon})
+            .addTo(map)
+            .bindPopup('<div class="popup-title popup-parking">First Presbyterian Church</div><div class="popup-address">4963 Balboa Blvd<br><strong>PARKING AVAILABLE</strong></div>');
+
+        // Encino Community Center (4935 Balboa Blvd) - VERIFIED OSM coordinates
+        L.marker([34.1601849, -118.5014111], {icon: parkingIcon})
+            .addTo(map)
+            .bindPopup('<div class="popup-title popup-parking">Encino Community Center</div><div class="popup-address">4935 Balboa Blvd<br><strong>PARKING AVAILABLE</strong></div>');
+
+        // Parking lot polygon style (blue shaded)
+        const parkingLotStyle = {
+            color: '#2563EB',
+            fillColor: '#3B82F6',
+            fillOpacity: 0.5,
+            weight: 2
+        };
+
+        // Encino Community Center Parking - user drawn, straightened
+        const communityParkingLot = L.polygon([
+            [34.1611, -118.5017],    // Top-left
+            [34.1601, -118.5017],    // Bottom-left (down the left side)
+            [34.1601, -118.5015],    // Jog east at bottom
+            [34.1606, -118.5015],    // Up to the step
+            [34.1606, -118.5011],    // East to Balboa
+            [34.1611, -118.5011],    // Top-right (up along Balboa)
+        ], parkingLotStyle).addTo(map)
+            .bindPopup('<div class="popup-title popup-parking">Encino Community Center Parking</div><div class="popup-address">4935 Balboa Blvd<br>Parking available</div>');
+
+        // Street parking - highlighted streets with green polylines
+        const streetParkingStyle = {
+            color: '#22C55E',
+            weight: 6,
+            opacity: 0.8
+        };
+
+        // Street parking lines - from user-drawn coordinates, straightened and connected
+
+        // Paso Robles Ave (Line 1) - north-south at -118.5022
+        const pasoRoblesAve = L.polyline([
+            [34.1596, -118.5022],
+            [34.1617, -118.5022]
+        ], streetParkingStyle).addTo(map)
+            .bindPopup('<div class="popup-title" style="color:#166534">Paso Robles Ave (4900)</div><div class="popup-address">Street parking available on both sides<br>11:00 AM - 8:00 PM</div>');
+
+        // Genesta Ave (Line 2) - north-south at -118.5033
+        const genestaAve = L.polyline([
+            [34.1599, -118.5033],
+            [34.1630, -118.5033]
+        ], streetParkingStyle).addTo(map)
+            .bindPopup('<div class="popup-title" style="color:#166534">Genesta Ave (4900-5000)</div><div class="popup-address">Street parking available on both sides<br>11:00 AM - 8:00 PM</div>');
+
+        // Addison St (Line 3) - east-west at 34.1617, connects to Genesta and Paso Robles
+        const addisonSt = L.polyline([
+            [34.1617, -118.5033],
+            [34.1617, -118.5013]
+        ], streetParkingStyle).addTo(map)
+            .bindPopup('<div class="popup-title" style="color:#166534">Addison St (16900)</div><div class="popup-address">Street parking available on both sides<br>11:00 AM - 8:00 PM</div>');
+
+        // Otsego St (Line 4) - east-west at 34.1630, connects to Genesta
+        const otsegoSt = L.polyline([
+            [34.1630, -118.5053],
+            [34.1630, -118.5012]
+        ], streetParkingStyle).addTo(map)
+            .bindPopup('<div class="popup-title" style="color:#166534">Otsego St (16900)</div><div class="popup-address">Street parking available on both sides<br>11:00 AM - 8:00 PM</div>');
+
+        // Fit map to show all markers and streets
+        const bounds = L.latLngBounds([
+            [34.1575, -118.5060],
+            [34.1655, -118.4955]
+        ]);
+        map.fitBounds(bounds, {padding: [20, 20]});
+
+    </script>
+</body>
+</html>
