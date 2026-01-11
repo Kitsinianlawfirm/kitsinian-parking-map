@@ -297,12 +297,8 @@
         ], streetParkingStyle).addTo(map)
             .bindPopup('<div class="popup-title" style="color:#166534">Otsego St (16900)</div><div class="popup-address">Street parking available on both sides<br>11:00 AM - 8:00 PM</div>');
 
-        // Fit map to show all markers and streets
-        const bounds = L.latLngBounds([
-            [34.1575, -118.5060],
-            [34.1655, -118.4955]
-        ]);
-        map.fitBounds(bounds, {padding: [20, 20]});
+        // Set default view - slightly zoomed in
+        map.setView([34.1612, -118.5025], 17.5);
 
     </script>
 </body>
