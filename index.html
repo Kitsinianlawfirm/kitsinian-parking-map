@@ -30,8 +30,61 @@
             color: #94a3b8;
         }
         #map {
-            height: calc(100vh - 220px);
+            height: calc(100vh - 70px);
             width: 100%;
+        }
+        .map-legend {
+            background: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            font-size: 12px;
+            max-width: 220px;
+        }
+        .map-legend h4 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            color: #1e293b;
+        }
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .map-legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .map-legend-icon.venue {
+            background: #DC2626;
+            color: white;
+        }
+        .map-legend-icon.parking {
+            background: #2563EB;
+            color: white;
+        }
+        .map-legend-icon.street {
+            background: #22C55E;
+            width: 24px;
+            height: 6px;
+            border-radius: 3px;
+        }
+        .map-legend-hours {
+            background: #f0fdf4;
+            border: 1px solid #22C55E;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-top: 8px;
+            font-size: 11px;
+            color: #166534;
         }
         .legend {
             background: white;
@@ -155,34 +208,6 @@
 
     <div id="map"></div>
 
-    <div class="legend">
-        <h3>LEGEND</h3>
-        <div class="legend-items">
-            <div class="legend-item">
-                <div class="legend-icon venue">★</div>
-                <span>ACF Sarkis & Suzan Kitsinian Youth Center (Event Venue)</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-icon parking">P</div>
-                <span>Designated Parking Lots</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-icon street"></div>
-                <span>Street Parking Available (both sides)</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="info-box">
-        <div class="info-item hours">
-            <strong>Street Parking Hours: 11:00 AM - 8:00 PM</strong>
-            Restrictions relaxed on marked streets (both sides)
-        </div>
-        <div class="info-item warning">
-            <strong>Still Enforced:</strong>
-            Red zones, handicapped zones, tow-away zones, alleys, sidewalks, no-parking signs
-        </div>
-    </div>
 
     <script>
         // Initialize the map centered on the Youth Center area
@@ -299,6 +324,33 @@
 
         // Set default view - zoomed in
         map.setView([34.1612, -118.5025], 18);
+
+        // Add legend control to map
+        const legendControl = L.control({position: 'bottomleft'});
+        legendControl.onAdd = function(map) {
+            const div = L.DomUtil.create('div', 'map-legend');
+            div.innerHTML = `
+                <h4>LEGEND</h4>
+                <div class="map-legend-item">
+                    <div class="map-legend-icon venue">★</div>
+                    <span>Event Venue</span>
+                </div>
+                <div class="map-legend-item">
+                    <div class="map-legend-icon parking">P</div>
+                    <span>Parking Lots</span>
+                </div>
+                <div class="map-legend-item">
+                    <div class="map-legend-icon street"></div>
+                    <span>Street Parking (both sides)</span>
+                </div>
+                <div class="map-legend-hours">
+                    <strong>Street Parking: 11 AM - 8 PM</strong><br>
+                    Restrictions relaxed on marked streets
+                </div>
+            `;
+            return div;
+        };
+        legendControl.addTo(map);
 
     </script>
 </body>
