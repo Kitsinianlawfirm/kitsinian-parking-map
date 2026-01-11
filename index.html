@@ -35,32 +35,51 @@
         }
         .map-legend {
             background: white;
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            font-size: 12px;
-            max-width: 220px;
+            font-size: 11px;
+            max-width: 200px;
+        }
+        .map-legend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
         }
         .map-legend h4 {
-            margin: 0 0 8px 0;
-            font-size: 13px;
+            margin: 0;
+            font-size: 12px;
             color: #1e293b;
+        }
+        .map-legend-toggle {
+            font-size: 10px;
+            color: #64748b;
+        }
+        .map-legend-content {
+            margin-top: 8px;
+        }
+        .map-legend.collapsed .map-legend-content {
+            display: none;
+        }
+        .map-legend.collapsed {
+            padding: 8px 12px;
         }
         .map-legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 6px;
+            margin-bottom: 5px;
         }
         .map-legend-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 10px;
             flex-shrink: 0;
         }
         .map-legend-icon.venue {
@@ -73,17 +92,17 @@
         }
         .map-legend-icon.street {
             background: #22C55E;
-            width: 24px;
-            height: 6px;
+            width: 20px;
+            height: 5px;
             border-radius: 3px;
         }
         .map-legend-hours {
             background: #f0fdf4;
             border: 1px solid #22C55E;
             border-radius: 4px;
-            padding: 6px 8px;
-            margin-top: 8px;
-            font-size: 11px;
+            padding: 5px 6px;
+            margin-top: 6px;
+            font-size: 10px;
             color: #166534;
         }
         .legend {
@@ -330,27 +349,33 @@
         legendControl.onAdd = function(map) {
             const div = L.DomUtil.create('div', 'map-legend');
             div.innerHTML = `
-                <h4>LEGEND</h4>
-                <div class="map-legend-item">
-                    <div class="map-legend-icon venue">★</div>
-                    <span>Event Venue</span>
+                <div class="map-legend-header" onclick="this.parentElement.classList.toggle('collapsed')">
+                    <h4>LEGEND</h4>
+                    <span class="map-legend-toggle">tap to hide/show</span>
                 </div>
-                <div class="map-legend-item">
-                    <div class="map-legend-icon parking">P</div>
-                    <span>Parking Lots</span>
-                </div>
-                <div class="map-legend-item">
-                    <div class="map-legend-icon street"></div>
-                    <span>Street Parking (both sides)</span>
-                </div>
-                <div class="map-legend-hours">
-                    <strong>Street Parking: 11 AM - 8 PM</strong><br>
-                    Restrictions relaxed on marked streets
-                </div>
-                <div style="background:#fef2f2;border:1px solid #DC2626;border-radius:4px;padding:6px 8px;margin-top:6px;font-size:10px;color:#991b1b;">
-                    <strong>Still Enforced:</strong> Red zones, handicapped, tow-away zones, alleys, sidewalks, no-parking signs
+                <div class="map-legend-content">
+                    <div class="map-legend-item">
+                        <div class="map-legend-icon venue">★</div>
+                        <span>Event Venue</span>
+                    </div>
+                    <div class="map-legend-item">
+                        <div class="map-legend-icon parking">P</div>
+                        <span>Parking Lots</span>
+                    </div>
+                    <div class="map-legend-item">
+                        <div class="map-legend-icon street"></div>
+                        <span>Street Parking (both sides)</span>
+                    </div>
+                    <div class="map-legend-hours">
+                        <strong>Parking: 11 AM - 8 PM</strong><br>
+                        Restrictions relaxed
+                    </div>
+                    <div style="background:#fef2f2;border:1px solid #DC2626;border-radius:4px;padding:5px 6px;margin-top:6px;font-size:9px;color:#991b1b;">
+                        <strong>Still Enforced:</strong> Red zones, handicapped, tow-away, alleys, sidewalks
+                    </div>
                 </div>
             `;
+            L.DomEvent.disableClickPropagation(div);
             return div;
         };
         legendControl.addTo(map);
