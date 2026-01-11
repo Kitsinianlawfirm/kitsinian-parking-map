@@ -294,13 +294,14 @@
         };
 
         // Encino Community Center Parking - user drawn, straightened
+        // Previous right edge: -118.5011 (if need to revert)
         const communityParkingLot = L.polygon([
             [34.1611, -118.5017],    // Top-left
             [34.1601, -118.5017],    // Bottom-left (down the left side)
             [34.1601, -118.5015],    // Jog east at bottom
             [34.1606, -118.5015],    // Up to the step
-            [34.1606, -118.5011],    // East to Balboa
-            [34.1611, -118.5011],    // Top-right (up along Balboa)
+            [34.1606, -118.5014],    // East edge (moved left to not cover Balboa)
+            [34.1611, -118.5014],    // Top-right (moved left to not cover Balboa)
         ], parkingLotStyle).addTo(map)
             .bindPopup('<div class="popup-title popup-parking">Encino Community Center Parking</div><div class="popup-address">4935 Balboa Blvd<br>Parking available</div>');
 
