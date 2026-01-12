@@ -349,7 +349,7 @@
         map.setView([34.1612, -118.5025], 17.5);
 
         // Add legend control to map
-        const legendControl = L.control({position: 'topright'});
+        const legendControl = L.control({position: 'topleft'});
         legendControl.onAdd = function(map) {
             const div = L.DomUtil.create('div', 'map-legend');
             div.innerHTML = `
