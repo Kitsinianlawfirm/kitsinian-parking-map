@@ -339,11 +339,15 @@
             .bindPopup('<div class="popup-title" style="color:#166534">Addison St (16900)</div><div class="popup-address">Street parking available on both sides<br>11:00 AM - 8:00 PM</div>');
 
         // Otsego St (Line 4) - east-west at 34.1630, connects to Genesta
-        const otsegoSt = L.polyline([
+        const otsegoStCoords = [
             [34.1630, -118.5053],
             [34.1630, -118.5012]
-        ], streetParkingStyle).addTo(map)
+        ];
+        // Invisible wider line for easier clicking
+        L.polyline(otsegoStCoords, {color: 'transparent', weight: 20, opacity: 0}).addTo(map)
             .bindPopup('<div class="popup-title" style="color:#166534">Otsego St (16900)</div><div class="popup-address">Street parking available on both sides<br>11:00 AM - 8:00 PM</div>');
+        // Visible line
+        L.polyline(otsegoStCoords, streetParkingStyle).addTo(map);
 
         // Set default view - zoomed in
         map.setView([34.1612, -118.5025], 17.5);
